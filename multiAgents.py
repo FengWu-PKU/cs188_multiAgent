@@ -12,6 +12,8 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
+from curses.ascii import NUL
+from os import curdir
 from util import manhattanDistance
 from game import Directions
 import random, util
@@ -161,7 +163,43 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        v=float("-inf")
+        res=None
+        pacLegalActions=gameState.getLegalActions(0)
+        for action in pacLegalActions:
+            val=self.min_value(gameState.generateSuccessor(0,action))
+            if v<val:
+                v=val
+                res=action
+        return res
+
+    def min_value(self,state,depth=0,agentID=1):
+        v=float("inf")
+        actions=state.getLegalActions(agentID)
+        if depth==self.depth or len(actions)==0:
+            return self.evaluationFunction(state)
+        for action in actions:
+            if agentID==state.getNumAgents()-1: # the last ghost
+                val=self.max_value(state.generateSuccessor(agentID,action),depth+1)
+            else:
+                val=self.min_value(state.generateSuccessor(agentID,action),depth,agentID+1)
+            v=min(v,val)
+        return v
+
+    def max_value(self,state,depth):
+        v=float("-inf")
+        actions=state.getLegalActions(0)
+        if depth==self.depth or len(actions)==0:
+            return self.evaluationFunction(state)
+        for action in actions:
+            val=self.min_value(state.generateSuccessor(0,action),depth)
+            v=max(v,val)
+        return v
+
+
+
+
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
