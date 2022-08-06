@@ -310,7 +310,29 @@ def betterEvaluationFunction(currentGameState):
     DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    
+    x,y = currentGameState.getPacmanPosition()
+    food = currentGameState.getFood()
+    ghostPositions=currentGameState.getGhostPositions()
+    ghostStates = currentGameState.getGhostStates()
+    scaredTimes = [ghostState.scaredTimer for ghostState in ghostStates]
+    scare=0
+    for i in scaredTimes:
+        scare+=i
+    disToGhosts=0
+    for ghost in ghostPositions:
+        gx,gy=ghost
+        disToGhosts+=abs(x-gx)+abs(y-gy)    # bigger is better
+    row=food.height
+    col=food.width
+    minDis=9999
+    for i in range(1,col-1):
+        for j in range(1,row-1):
+            if food[i][j]:
+                minDis=min(minDis,abs(x-i)+abs(y-j))
+    if minDis==9999: minDis=0   # for the last food
+    return currentGameState.getScore()+scare+disToGhosts-minDis
+    
 
 # Abbreviation
 better = betterEvaluationFunction
